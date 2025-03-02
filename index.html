@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker - Google Calendar Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1e1e1e;
+            color: #ddd;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            background: #252525;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+        }
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            padding: 10px;
+        }
+        .day-header, .day-cell {
+            padding: 15px;
+            text-align: center;
+            border-radius: 5px;
+            transition: background 0.3s, border 0.3s;
+        }
+        .day-header {
+            background: #333;
+            font-weight: bold;
+            color: #fff;
+        }
+        .day-cell {
+            background: #2a2a2a;
+            cursor: pointer;
+            position: relative;
+            min-height: 80px;
+        }
+        .day-cell:hover {
+            background: #444;
+        }
+        .day-cell.checked::after {
+            content: '\2713';
+            color: #0f0;
+            font-size: 18px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .button {
+            padding: 10px 15px;
+            background: #0f62fe;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .button:hover {
+            background: #0a4eb0;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        .modal input, .modal button {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        .modal button {
+            background: #0f62fe;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Habit Tracker - Calendar View</h1>
+        <div class="controls">
+            <button class="button" onclick="openModal()">Add Habit</button>
+            <button class="button" onclick="removeHabit()">Remove Habit</button>
+        </div>
+        <div class="calendar" id="calendar"></div>
+    </div>
+    <div class="modal" id="habitModal">
+        <input type="text" id="habitName" placeholder="Enter Habit Name">
+        <input type="date" id="habitDate">
+        <button onclick="saveHabit()">Save</button>
+        <button onclick="closeModal()">Cancel</button>
+    </div>
+    <script>
+        let habits = JSON.parse(localStorage.getItem("habits")) || [];
+        const calendar = document.getElementById("calendar");
+        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        
+        function renderCalendar() {
+            calendar.innerHTML = "";
+            daysOfWeek.forEach(day => {
+                calendar.innerHTML += `<div class='day-header'>${day}</div>`;
+            });
+            for (let i = 1; i <= 35; i++) {
+                calendar.innerHTML += `<div class='day-cell' onclick='toggleCheck(this)'></div>`;
+            }
+        }
+
+        function toggleCheck(el) {
+            el.classList.toggle("checked");
+        }
+
+        function openModal() {
+            document.getElementById("habitModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("habitModal").style.display = "none";
+        }
+
+        function saveHabit() {
+            const habitName = document.getElementById("habitName").value;
+            const habitDate = document.getElementById("habitDate").value;
+            if (habitName && habitDate) {
+                habits.push({ name: habitName, date: habitDate });
+                localStorage.setItem("habits", JSON.stringify(habits));
+                closeModal();
+            }
+        }
+
+        function removeHabit() {
+            const habitToRemove = prompt("Enter habit name to remove:");
+            habits = habits.filter(habit => habit.name !== habitToRemove);
+            localStorage.setItem("habits", JSON.stringify(habits));
+        }
+
+        renderCalendar();
+    </script>
+</body>
+</html>
